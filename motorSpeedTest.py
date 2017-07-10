@@ -40,9 +40,9 @@ def main(stdscr):
 				dirPin.off()
 				stdscr.addstr("\n" + "direction: 0")
 		motorPin.on()
-       		sleep(0.001*factor)
+       		sleep(0.01*factor)
       		motorPin.off()
-      		sleep(0.001*factor)
+      		sleep(0.01*factor)
         	count+=1
        		if count%200 == 0:
                		sleep(1)
