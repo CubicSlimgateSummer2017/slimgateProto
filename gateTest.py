@@ -46,18 +46,6 @@ gateTimer = 0
 #Current state of the machine
 currState = 1
 
-#
-def motorOpen(q):
-#	tmp = q.get()
-	if (q.empty() == False):
-		print("open")
-		dirPin.off()
-#		for i in range(0,200):
-#			motorPin.on()
-#			sleep(0.1)
-#			motorPin.off()
-#			sleep(0.1)
-
 pygame.init()
 
 pygame.display.set_mode((100,100))
@@ -93,9 +81,10 @@ while Running:
 					cardTimer = 0
 				elif smartCard == 0:
 					smartCard = 1
+					currState = 4
 					startCardTimer = True
 	#turn on timer if safe flag 1
-	if shortFlag == 1:
+	if gate == 1 or shortFlag == 1:
 		startGateTimer = True
 	else:
 		gateTimer = 0
@@ -120,24 +109,21 @@ while Running:
         if startCardTimer == True:
                 cardTimer += 1
                 # while loop runs every 0.1 seconds, 10 = roughly 1 sec(not accounting for program runtime)
-                if cardTimer >= 300:
+                if cardTimer >= 400:
                         startCardTimer = False
                         smartCard = 0
                         cardTimer = 0
         #idleTimer
         if startIdleTimer == True:
                 idleTimer += 1
-                if idleTimer >= 300:
-#                       startIdleTimer = False
-#                       sensors = [0,0,0,0,0,0]
-#                       smartCard = 0
+                if idleTimer >= 400:
                         alarm = 1
                         currState = 1
 
         #second timer for if gate is open too long
         if startGateTimer == True:
                 gateTimer += 1
-                if gateTimer >= 300:
+                if gateTimer >= 400:
                         alarm = 1
 	
 	sensorArray1 = ser1.readline()
@@ -146,10 +132,10 @@ while Running:
 	sensor1 = str(sensorArray1)
 	sensor2 =str(sensorArray2)
 
-	print(sensor1)
-	print(sensor2)	
-	print(len(sensor1))
-	print(len(sensor2))
+#	print(sensor1)
+#	print(sensor2)	
+#	print(len(sensor1))
+#	print(len(sensor2))
 
 	if (int(sensor1[18]) == 1):
 		sensors[0] = 1
@@ -162,14 +148,14 @@ while Running:
 		sensors[1] = 0
 
 	if (int(sensor2[18]) == 1):
-		sensors[2] = 1
-	else:
-		sensors[2] = 0
-
-	if (int(sensor2[8]) == 1):
 		sensors[3] = 1
 	else:
 		sensors[3] = 0
+
+	if (int(sensor2[8]) == 1):
+		sensors[2] = 1
+	else:
+		sensors[2] = 0
 
 #Set state rules
 
@@ -194,7 +180,8 @@ while Running:
                         currState = 4
         elif currState == 4:
                 startIdleTimer = True
-                gate = 1
+                startGateTimer = True
+		gate = 1
 		ser3.write("o")
                 if sensors[2] == 1:
                         startIdleTimer = False
@@ -218,18 +205,6 @@ while Running:
                         currState = 1
 
         print('gate:' + str(gate) + ' sensors:' + str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + ' card:' + str(smartCard) + ' state:' + str(currState) + " flag:" + str(shortFlag))
-
-#	print(str(sensor1[18]) + str(sensor1[8]))
-#	print(str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]))
-
-#	if (sensors[0] == 1 and sensors[1] == 1):
-#		if gateState == 0:
-#			ser3.write("o")
-#			gateState = 1
-#	elif (sensors[2] == 1 and sensors[3] == 1):
-#		if gateState == 1:
-#			ser3.write("c")
-#			gateState = 0
 
 	ser1.flush()
 	ser2.flush()
