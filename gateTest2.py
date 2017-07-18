@@ -17,9 +17,9 @@ gateState = 0
 ser1 = serial.Serial('/dev/ttyACM0', 9600)
 #back sensor sensors
 ser2 = serial.Serial('/dev/ttyACM1', 9600)
-#ser2 = serial.Serial('/dev/ttyUSB0', 115200)
-#ser2.write("T")
-#ser2.write("P")
+ser3 = serial.Serial('/dev/ttyUSB0', 115200)
+ser3.write("T")
+#ser3.write("P")
 
 #motor arduino
 #ser3 = serial.Serial('/dev/ttyACM2', 9600)
@@ -110,7 +110,7 @@ while Running:
                                 gateTimer = 0
                                 startGateTimer = False
                 else:
-			os.system("python buzzerTest.py")
+#			os.system("python buzzerTest.py")
                         print("ALARM")
 
 #Timer rules
@@ -139,15 +139,17 @@ while Running:
 	
 	sensorArray1 = ser1.readline()
 	sensorArray2 = ser2.readline()
+	teraranger1 = ser3.readline()
 
 	sensor1 = str(sensorArray1)
-	sensor2 =str(sensorArray2)
+	sensor2 = str(sensorArray2)
+	tera1 = str(teraranger1)
 
-	print(sensor1)
-	print(sensor2)	
-	print(len(sensor1))
-	print(len(sensor2))
-
+#	print(sensor1)
+#	print(sensor2)	
+#	print(len(sensor1))
+#	print(len(sensor2))
+	print(tera1)
 
 
 
