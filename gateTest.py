@@ -18,13 +18,13 @@ gateState = 0
 #front sensor sensors
 ser1 = serial.Serial('/dev/ttyACM0', 115200)
 #back sensor sensors
-ser2 = serial.Serial('/dev/ttyACM1', 115200)
+ser2 = serial.Serial('/dev/ttyACM2', 115200)
 ser4 = serial.Serial('/dev/ttyUSB0', 115200)
 ser4.write("T")
 ser4.write("P")
 
 #motor arduino
-ser3 = serial.Serial('/dev/ttyACM2', 115200)
+ser3 = serial.Serial('/dev/ttyACM1', 115200)
 
 #flush all sensors before beginning
 ser1.flushInput()
@@ -65,6 +65,7 @@ print('| 1 | 2 | 3 | 4 |')
 print('-----------------')
 
 while Running:
+#	time.sleep(0.1)
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			Running = False
@@ -108,6 +109,9 @@ while Running:
                         if startGateTimer == True:
                                 gateTimer = 0
                                 startGateTimer = False
+			if gate == 1:
+				ser3.write("c")
+				gate = 0
                 else:
 			ser3.write("a")
 			alarm = 0
@@ -147,17 +151,25 @@ while Running:
 	
 	print tera1
 		
-#	print(sensor1)
-#	print(sensor2)	
-#	print(len(sensor1))
-#	print(len(sensor2))
+	print(sensor1)
+	print(sensor2)	
+	print(len(sensor1))
+	print(len(sensor2))
+
+	if ((len(sensor1) < 51) or (len(sensor2) < 51)):
+		ser1.flushInput()
+		print("flushed ser1")
+		ser2.flushInput()
+		print("flushed ser2")
+		continue
+	
 	try:
-		if((int(sensor2[18]) + int(sensor2[8]) + int(sensor1[18]) + int(sensor1[8])) == 0):
+		if((int(sensor2[8]) + int(sensor1[8])) == 0):
 			shortFlag = 0
 		else:
 			shortFlag = 1
 
-		if (int(sensor1[18]) == 1 or (tera1 > 200 and tera1 < 2500)):
+		if (int(sensor1[18]) == 1 or (tera1 > 220 and tera1 < 2000)):
 			sensors[0] = 1
 		else:
 			sensors[0] = 0
@@ -179,63 +191,63 @@ while Running:
 
 	except (ValueError, IndexError):
 #		print("parse error, passing")
-		pass
+		continue
 
 #Set state rules
 
-        if currState == 1:
+	if currState == 1:
 #		startIdleTimer = True
-                if (sensors[1] or sensors[2] or sensors[3] == 1):
-                       startIdleTimer = True
+		if (sensors[1] or sensors[2] or sensors[3] == 1):
+		       startIdleTimer = True
 		
-                elif (sensors[0] == 1):
-                        startIdleTimer = False
-                        idleTimer = 0
-                        currState = 2
+		elif (sensors[0] == 1):
+			startIdleTimer = False
+			idleTimer = 0
+			currState = 2
 #               elif (sensors[1] or sensors[2] or sensors[3] == 1):
 #                       startIdleTimer = True
-        elif currState == 2:
-                startIdleTimer = True
-                if sensors[1] == 1:
-                        startIdleTimer = False
-                        idleTimer = 0
-                        currState = 3
-        elif currState == 3:
-                startIdleTimer = True
-                if smartCard == 1:
-                        startIdleTimer = False
-                        idleTimer = 0
-                        currState = 4
-        elif currState == 4:
-                startIdleTimer = True
-                startGateTimer = True
+	elif currState == 2:
+		startIdleTimer = True
+		if sensors[1] == 1:
+			startIdleTimer = False
+			idleTimer = 0
+			currState = 3
+	elif currState == 3:
+		startIdleTimer = True
+		if smartCard == 1:
+			startIdleTimer = False
+			idleTimer = 0
+			currState = 4
+	elif currState == 4:
+		startIdleTimer = True
+		startGateTimer = True
 		gate = 1
 		ser3.write("o")
-                if sensors[2] == 1:
-                        startIdleTimer = False
-                        idleTimer = 0
-                        currState = 5
-        elif currState == 5:
-                startGateTimer = True
-                if sensors[2] == 0 and shortFlag == 0:
-                        startGateTimer = False
-                        gateTimer = 0
-                        currState = 6
-        elif currState == 6:
-#               smartCard = 0
-#               gate = 0
-#		ser3.write("c")
-                if sensors[3] == 1 or shortFlag == 0:
-                        currState = 7
-        elif currState == 7:
-		smartCard = 0
-		gate = 0
+		if sensors[2] == 1:
+			startIdleTimer = False
+			idleTimer = 0
+			currState = 5
+	elif currState == 5:
+		startGateTimer = True
+		if sensors[2] == 0 and shortFlag == 0:
+			startGateTimer = False
+			gateTimer = 0
+			currState = 6
+	elif currState == 6:
+                smartCard = 0
+                gate = 0
 		ser3.write("c")
-                startIdleTimer = True
-                if sensors [3] == 0:
-                        currState = 1
+		if sensors[3] == 1 or shortFlag == 0:
+			currState = 7
+	elif currState == 7:
+#		smartCard = 0
+#		gate = 0
+#		ser3.write("c")
+		startIdleTimer = True
+		if sensors [3] == 0:
+			currState = 1
 
-        print('gate:' + str(gate) + ' sensors:' + str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + ' card:' + str(smartCard) + ' state:' + str(currState) + " flag:" + str(shortFlag))
+	print('gate:' + str(gate) + ' sensors:' + str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + ' card:' + str(smartCard) + ' state:' + str(currState) + " flag:" + str(shortFlag))
 
 	ser1.flushInput()
 	ser2.flushInput()
