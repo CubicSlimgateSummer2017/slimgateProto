@@ -18,13 +18,13 @@ gateState = 0
 #front sensor sensors
 ser1 = serial.Serial('/dev/ttyACM0', 115200)
 #back sensor sensors
-ser2 = serial.Serial('/dev/ttyACM2', 115200)
+ser2 = serial.Serial('/dev/ttyACM1', 115200)
 ser4 = serial.Serial('/dev/ttyUSB0', 115200)
 ser4.write("T")
 ser4.write("P")
 
 #motor arduino
-ser3 = serial.Serial('/dev/ttyACM1', 115200)
+ser3 = serial.Serial('/dev/ttyACM2', 115200)
 
 #flush all sensors before beginning
 ser1.flushInput()
