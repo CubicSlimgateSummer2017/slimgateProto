@@ -74,6 +74,8 @@ while Running:
 				Running = False
 			elif event.key == K_SPACE:
 				print("all sensors reset and current state set to 1")
+				ser3.write("s")
+				alarm = 0
 				startCardTimer = False
 				startIdleTimer = False
 				cardTimer = 0
@@ -81,8 +83,8 @@ while Running:
 				sensors = [0,0,0,0]
 				smartCard = 0
 				currState = 1
-				alarm = 0
 				ser3.write("o")
+				time.sleep(0.1)
 				ser3.write("c")
 			elif event.key == K_c:
 				if smartCard == 1:
@@ -102,6 +104,7 @@ while Running:
         if alarm == 1:
                 if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
 			ser3.write("s")
+			print(gate)
 			alarm = 0
                         if startIdleTimer == True:
                                 idleTimer = 0
@@ -123,21 +126,21 @@ while Running:
         if startCardTimer == True:
                 cardTimer += 1
                 # while loop runs every 0.1 seconds, 10 = roughly 1 sec(not accounting for program runtime)
-                if cardTimer >= 400:
+                if cardTimer >= 300:
                         startCardTimer = False
                         smartCard = 0
                         cardTimer = 0
         #idleTimer
         if startIdleTimer == True:
                 idleTimer += 1
-                if idleTimer >= 400:
+                if idleTimer >= 300:
                         alarm = 1
                         currState = 1
 
         #second timer for if gate is open too long
         if startGateTimer == True:
                 gateTimer += 1
-                if gateTimer >= 400:
+                if gateTimer >= 300:
                         alarm = 1
 	
 	sensorArray1 = ser1.readline()
@@ -235,14 +238,15 @@ while Running:
 			currState = 6
 	elif currState == 6:
                 smartCard = 0
-                gate = 0
-		ser3.write("c")
+#		if gate == 1:
+#                	gate = 0
+#			ser3.write("c")
 		if sensors[3] == 1 or shortFlag == 0:
 			currState = 7
 	elif currState == 7:
-#		smartCard = 0
-#		gate = 0
-#		ser3.write("c")
+		smartCard = 0
+		gate = 0
+		ser3.write("c")
 		startIdleTimer = True
 		if sensors [3] == 0:
 			currState = 1
