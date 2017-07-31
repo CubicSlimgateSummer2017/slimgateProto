@@ -17,8 +17,8 @@
         <!-- Add your site or application content here -->
         <div class="jumbotron">
           <div class="container">
-            <h1>Raspberry Pi Internet 'Thing' Part 4</h1>
-            <p>Hello world! Welcome to my internet thing!</p>
+            <h1>Slimgate Dashboard</h1>
+            <p>Welcome to the Slimgate Dashboard!</p>
           </div>
         </div>
 
@@ -39,12 +39,18 @@
           </div>
         </div>
 
+	<div>
+	  <h3 id="test">state is: {{state}}</h3>
+	</div>
+
         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
         <script>
+	  var state = 0;
+
           $(document).ready(function() {
             // Setup temperature & humidity chart.
             var ctx = $('#dht_chart').get(0).getContext('2d');
@@ -105,13 +111,20 @@
 
             // Create SocketIO connect and attach handlers for events from the server.
             var socket = io.connect();
+	    /*
             socket.on('switch_change', function(e) {
               updateSwitch(e.switch);
             });
             socket.on('temp_humidity_change', function(e) {
               updateTempHumidity(e.temperature, e.humidity);
             });
-
+	    */
+	    socket.on('state_change', function(e) {
+	      state = e.state;
+	      console.log(state);
+	      //$('#test').empty();
+	      $('#test').empty().append("state is: " + state);
+	    });
             // Setup button click handlers.
             $('#led_on').click(function() {
               // Use SocketIO to send a LED change event.

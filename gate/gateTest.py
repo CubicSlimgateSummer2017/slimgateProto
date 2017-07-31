@@ -50,8 +50,11 @@ currState = 1
 
 #Helper functions
 def int_check(s):
-	s = s.strip()
-	return int(s) if s else 0
+	try:
+		s = s.strip()
+		return int(s) if s else 0
+	except(ValueError):
+		pass
 
 pygame.init()
 
@@ -71,6 +74,7 @@ while Running:
 			Running = False
 		if event.type == KEYDOWN:
 			if event.key == K_ESCAPE:
+				ser3.write("s")
 				Running = False
 			elif event.key == K_SPACE:
 				print("all sensors reset and current state set to 1")

@@ -1,4 +1,4 @@
-import thing
+import gate
 
 from flask import *
 from flask_socketio import SocketIO
@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 # Create flask app, SocketIO object, and global pi 'thing' object.
 app = Flask(__name__)
 socketio = SocketIO(app)
-pi_thing = thing.PiThing()
+gate = gate.Slimgate()
 
 
 # Define app routes.
@@ -15,32 +15,35 @@ pi_thing = thing.PiThing()
 @app.route("/")
 def index():
     # Read the current switch state to pass to the template.
-    switch = pi_thing.read_switch()
+#    switch = pi_thing.read_switch()
     # Render index.html template.
-    return render_template('index.html', switch=switch)
+    return render_template('index.html')
 
 # Listen for SocketIO event that will change the LED.
-@socketio.on('change_led')
-def change_led(led):
-    if led == 'on':
-        pi_thing.set_led(True)
-    elif led == 'off':
-        pi_thing.set_led(False)
+#@socketio.on('change_led')
+#def change_led(led):
+#    if led == 'on':
+#        pi_thing.set_led(True)
+#    elif led == 'off':
+#        pi_thing.set_led(False)
 
 # Internal callback that will be called when the switch changes state.
-def switch_change(switch):
+#def switch_change(switch):
     # Broadcast a switch change event.
-    socketio.emit('switch_change', { 'switch': switch })
+#   socketio.emit('switch_change', { 'switch': switch })
 
 # Internal callback that will be called when a new temperature & humidity reading is ready.
-def temp_humidity_change(temperature, humidity):
+#def temp_humidity_change(temperature, humidity):
     # Broadcast a temp & humidity change event.
-    socketio.emit('temp_humidity_change', { 'temperature': temperature, 'humidity': humidity })
+#   socketio.emit('temp_humidity_change', { 'temperature': temperature, 'humidity': humidity })
 
+def state_change(state):
+    socketio.emit('state_change', {'state': state})
 
 if __name__ == "__main__":
     # Register callbacks for switch and temp/humidity event changes.
-    pi_thing.on_switch_change(switch_change)
-    pi_thing.on_temp_humidity_change(temp_humidity_change)
+#   pi_thing.on_switch_change(switch_change)
+#   pi_thing.on_temp_humidity_change(temp_humidity_change)
+    gate.on_state_change(state_change)
     # Run the flask development web server with SocketIO.
     socketio.run(app, host='0.0.0.0', debug=True)
