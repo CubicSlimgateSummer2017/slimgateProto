@@ -49,7 +49,7 @@
         <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
         <script>
-	  var state = 0;
+	  var data = "to be changed";
 
           $(document).ready(function() {
             // Setup temperature & humidity chart.
@@ -119,11 +119,11 @@
               updateTempHumidity(e.temperature, e.humidity);
             });
 	    */
-	    socket.on('state_change', function(e) {
-	      state = e.state;
-	      console.log(state);
+	    socket.on('data_change', function(e) {
+	      data = e.data;
+	      console.log(data);
 	      //$('#test').empty();
-	      $('#test').empty().append("state is: " + state);
+	      $('#test').empty().append("data is: " + data);
 	    });
             // Setup button click handlers.
             $('#led_on').click(function() {

@@ -1,4 +1,4 @@
-import gate
+import dataHandler
 
 from flask import *
 from flask_socketio import SocketIO
@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 # Create flask app, SocketIO object, and global pi 'thing' object.
 app = Flask(__name__)
 socketio = SocketIO(app)
-gate = gate.Slimgate()
+dataHandler = dataHandler.dataHandler()
 
 
 # Define app routes.
@@ -17,7 +17,7 @@ def index():
     # Read the current switch state to pass to the template.
 #    switch = pi_thing.read_switch()
     # Render index.html template.
-    return render_template('index.html')
+    return render_template('index_test.html')
 
 # Listen for SocketIO event that will change the LED.
 #@socketio.on('change_led')
@@ -37,13 +37,13 @@ def index():
     # Broadcast a temp & humidity change event.
 #   socketio.emit('temp_humidity_change', { 'temperature': temperature, 'humidity': humidity })
 
-def state_change(state):
-    socketio.emit('state_change', {'state': state})
+def data_change(data):
+    socketio.emit('data_change', {'data': data})
 
 if __name__ == "__main__":
     # Register callbacks for switch and temp/humidity event changes.
 #   pi_thing.on_switch_change(switch_change)
 #   pi_thing.on_temp_humidity_change(temp_humidity_change)
-    gate.on_state_change(state_change)
+    dataHandler.on_data_change(data_change)
     # Run the flask development web server with SocketIO.
     socketio.run(app, host='0.0.0.0', debug=True)

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <!-- Place favicon.ico in the root directory -->
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div class="jumbotron">
+          <div class="container">
+            <h1>Slimgate Dashboard</h1>
+            <p>Welcome to the Slimgate Dashboard!</p>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Switch: <span id='switch_value' class="label"></span></h3>
+            </div>
+            <div class="col-md-4">
+              <h3>LED</h3>
+              <button class="btn btn-default" type='button' id='led_on'>LED ON</button>
+              <button class="btn btn-default" type='button' id='led_off'>LED OFF</button>
+            </div>
+            <div class="col-md-4">
+              <h2>DHT Sensor</h2>
+              <canvas id='dht_chart' width='400' height='400'></canvas>
+            </div>
+          </div>
+        </div>
+
+	<div>
+	  <h3 id="test">state is: {{state}}</h3>
+	</div>
+
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+        <script>
+	  var data = "to be changed";
+
+          $(document).ready(function() {
+            // Create SocketIO connect and attach handlers for events from the server.
+            var socket = io.connect();
+	    
+	    socket.on('data_change', function(e) {
+	      data = e.data;
+	      console.log(data);
+	      //$('#test').empty();
+	      $('#test').empty().append("data is: " + data);
+	    });
+          });
+        </script>
+    </body>
+</html>

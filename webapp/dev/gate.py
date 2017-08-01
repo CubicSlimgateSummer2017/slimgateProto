@@ -10,15 +10,14 @@ from termios import tcflush, TCIOFLUSH
 import serial
 import time
 
-from gpiozero import LED
+from gpiozero import Button
 from time import sleep
 
 class Slimgate(object):
 
 	count = 0
 
-	motorPin = LED(18)
-	dirPin = LED(23)
+	button = Button(18)
 
 	#front sensor self.sensors
 	ser1 = serial.Serial('/dev/ttyACM0', 115200)
@@ -107,6 +106,16 @@ class Slimgate(object):
 #								self.smartCard = 1
 #								self.state = 4
 #								self.startCardTimer = True
+				
+				if self.button.is_pressed:
+					if self.smartCard == 1:
+						cardTimer = 0 
+					elif self.smartCard == 0:
+						print("card")
+						self.smartCard = 1 
+						self.currState = 4 
+						self.startCardTimer = True
+				
 				#turn on timer if safe flag 1
 				if self.gate == 1 or self.shortFlag == 1:
 					self.startGateTimer = True

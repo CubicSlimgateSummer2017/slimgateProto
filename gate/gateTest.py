@@ -8,11 +8,10 @@ import sys
 from termios import tcflush, TCIOFLUSH
 import serial, time
 
-from gpiozero import LED
+from gpiozero import Button
 from time import sleep
 
-motorPin = LED(18)
-dirPin = LED(23)
+button = Button(18)
 gateState = 0
 
 #front sensor sensors
@@ -97,6 +96,16 @@ while Running:
 					smartCard = 1
 					currState = 4
 					startCardTimer = True
+
+					
+	if button.is_pressed:
+		if smartCard == 1:
+			cardTimer = 0
+		elif smartCard == 0:
+			smartCard = 1
+			currState = 4
+			startCardTimer = True
+	
 	#turn on timer if safe flag 1
 	if gate == 1 or shortFlag == 1:
 		startGateTimer = True
@@ -255,6 +264,11 @@ while Running:
 		if sensors [3] == 0:
 			currState = 1
 
+	f = open('data.txt', 'w')
+	printstr = str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + str(gate) + str(smartCard) + str(currState) + str(shortFlag)
+	f.write(printstr)
+	f.close()
+	
 	print('gate:' + str(gate) + ' sensors:' + str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + ' card:' + str(smartCard) + ' state:' + str(currState) + " flag:" + str(shortFlag))
 
 	ser1.flushInput()

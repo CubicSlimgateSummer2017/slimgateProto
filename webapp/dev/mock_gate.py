@@ -1,7 +1,7 @@
 import time
 import threading
 
-class mockGate(object):
+class slimgate(object):
 
 	count = 0
 
@@ -9,11 +9,11 @@ class mockGate(object):
 #		count = 0
 		self._lock = threading.Lock()
 		self._count_callback = None
-		self._state_thread = threading.Thread(target=self._update_state)
-		self._state_thread.daemon = True
-		self._state_thread.start()
+		self._count_thread = threading.Thread(target=self._update_count)
+		self._count_thread.daemon = True
+		self._count_thread.start()
 
-	def _update_state(self):
+	def _update_count(self):
 		for i in range(0,1000):
 			with self._lock:
 #				print("testing repeated outputs, count = " + str(count))
