@@ -50,6 +50,7 @@
         <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
         <script>
 	  var data = "to be changed";
+	  var count = "number of opens";
 
           $(document).ready(function() {
             // Create SocketIO connect and attach handlers for events from the server.
@@ -57,7 +58,9 @@
 	    
 	    socket.on('data_change', function(e) {
 	      data = e.data;
+	      count = e.count;
 	      console.log(data);
+	      //console.log(count);
 	      //$('#test').empty();
 	      $('#test').empty().append("data is: " + data);
 	    });

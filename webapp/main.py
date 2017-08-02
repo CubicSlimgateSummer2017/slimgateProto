@@ -17,7 +17,7 @@ def index():
     # Read the current switch state to pass to the template.
 #    switch = pi_thing.read_switch()
     # Render index.html template.
-    return render_template('index_test.html')
+    return render_template('index.html')
 
 # Listen for SocketIO event that will change the LED.
 #@socketio.on('change_led')
@@ -37,8 +37,15 @@ def index():
     # Broadcast a temp & humidity change event.
 #   socketio.emit('temp_humidity_change', { 'temperature': temperature, 'humidity': humidity })
 
-def data_change(data):
-    socketio.emit('data_change', {'data': data})
+def data_change(data, count):
+    socketio.emit('data_change', {'data': data, 'count': count})
+
+@app.route("/test")
+def test_page():
+	return render_template('test.html')
+
+def data_change(data, count):
+    socketio.emit('data_change', {'data': data, 'count': count})
 
 if __name__ == "__main__":
     # Register callbacks for switch and temp/humidity event changes.
