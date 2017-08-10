@@ -17,31 +17,30 @@
         <!-- Add your site or application content here -->
         <div class="jumbotron">
           <div class="container">
-            <h1>Slimgate Dashboard</h1>
-            <p>Welcome to the Slimgate Dashboard!</p>
-          </div>
+            <h1>Slimgate Display</h1>
+            <p>Slimgate Display Simulation</p>
+            <a href="/"><button class="btn btn-default" type='button'>Dashboard</button></a>
+ 	  </div>
         </div>
 
         <div class="container">
           <div class="row">
-            <div class="col-md-4">
-              <h3>Switch: <span id='switch_value' class="label"></span></h3>
-            </div>
-            <div class="col-md-4">
-              <h3>LED</h3>
-              <button class="btn btn-default" type='button' id='led_on'>LED ON</button>
-              <button class="btn btn-default" type='button' id='led_off'>LED OFF</button>
-            </div>
-            <div class="col-md-4">
-              <h2>DHT Sensor</h2>
-              <canvas id='dht_chart' width='400' height='400'></canvas>
-            </div>
+            <div class="col-md-6" style="height: 35em; background-color: #e6e6e6" id="front_screen">
+              <!--<img src="{{ url_for('static', filename='images/check-mark.png') }}" style="width:35em; height:35em;"<img>
+            --></div>
+            <div class="col-md-6" style="height: 35em; background-color: #e6e6e6" id="back_screen">
+            	<img src="{{ url_for('static', filename='images/x-mark.png') }}" style="width:35em; height:35em;"<img>
+	    </div>
+	    <div class="row">
+              <div class="col-md-6">
+	        <p>front</p>
+	      </div>
+              <div class="col-md-6">
+	        <p>back</p>
+	      </div>
+	    </div>
           </div>
         </div>
-
-	<div>
-	  <h3 id="test">state is: {{state}}</h3>
-	</div>
 
         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
@@ -51,6 +50,8 @@
         <script>
 	  var data = "to be changed";
 	  var count = "number of opens";
+	  var state = "current state";
+	  var buttton = "button";
 
           $(document).ready(function() {
             // Create SocketIO connect and attach handlers for events from the server.
@@ -59,10 +60,19 @@
 	    socket.on('data_change', function(e) {
 	      data = e.data;
 	      count = e.count;
-	      console.log(data);
+	      state = data.charAt(6);
+	      button = data.charAt(5);
+	      console.log(button);
 	      //console.log(count);
 	      //$('#test').empty();
-	      $('#test').empty().append("data is: " + data);
+	      //$('#test').empty().append("data is: " + data);
+	      if (button == 1) {
+	        $('#front_screen').empty().append("<img src='{{ url_for('static', filename='images/check-mark.png') }}' style='width:35em; height:35em;'<img> ");
+	      }
+	      else {
+                $('#front_screen').empty();
+	      }
+
 	    });
           });
         </script>

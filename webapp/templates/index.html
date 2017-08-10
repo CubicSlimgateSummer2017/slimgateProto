@@ -20,40 +20,62 @@
           <div class="container">
             <h1>Slimgate Dashboard</h1>
             <p>Welcome to the Slimgate Dashboard!</p>
+	    <a href="display"><button class="btn btn-default" type='button' id='display'>Gate Displays</button></a>
           </div>
         </div>
 
         <div class="container">
           <div class="row">
-            <div class="col-md-4">
-              <h3>Number of Entries: <span id='switch_value' class="label"></span></h3>
-	      <h4 id='entries'>0</h4>
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Number of Entries: <span id='switch_value' class="label"></span></h2>
+	      <h3 id='entries'>0</h3>
             </div>
-            <div class="col-md-4">
-              <h3>Zones</h3>
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Zones: </h2>
 		<div class="led-box" id="zone1">
 	          <div class="led-red"></div>
+		  <p>1</p>
 		</div>
 		<div class="led-box" id="zone2">
 		  <div class="led-red"></div>
+		  <p>2</p>
 		</div>
 	        <div class="led-box" id="zone3">
 	          <div class="led-red"></div>
+		  <p>3</p>
 		</div>
 	        <div class="led-box" id="zone4">
 	          <div class="led-red"></div>
+		  <p>4</p>
 		</div>
             </div>
-            <div class="col-md-4">
-              <h2>DHT Sensor</h2>
-              <canvas id='dht_chart' width='400' height='400'></canvas>
+            
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Current State: </h2>
+              <h3 id="current_state">0</h3>
             </div>
-          </div>
+            
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Gate State: </h2>
+	      <div class="led-box" id="gate_state">
+	        <div class="led-red"></div>
+	      </div>
+            </div>
+            
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Short Flag: </h2>
+	      <div class="led-box" id="short_flag">
+	        <div class="led-red"></div>
+	      </div>
+            </div>
+            
+	    <div class="col-md-4" style="height: 20em;">
+              <h2>Gate Uptime: </h2>
+	      <h4 id="time">uptime</h4>
+            </div>
+          
+	  </div>
         </div>
-
-	<div>
-	  <h3 id="test">state is: {{state}}</h3>
-	</div>
 
         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
@@ -63,6 +85,8 @@
         <script>
 	  var data = "to be changed";
 	  var count = "number of opens";
+	  var time = "server uptime";	
+	  var state = "current state";
 
           $(document).ready(function() {
             // Create SocketIO connect and attach handlers for events from the server.
@@ -71,38 +95,53 @@
 	    socket.on('data_change', function(e) {
 	      data = e.data;
 	      count = e.count;
-	      console.log(data);
-	      console.log(count);
-	      //$('#test').empty();
+	      time = e.time.substring(0, (e.time.length) - 5);
+	      state = data.charAt(6);
 	      $('#test').empty().append("data is: " + data);
 	      $('#entries').empty().append(count + "");
-
+	      $('#time').empty().append(time + "");
+	      $('#current_state').empty().append(state + "");
+	      
 	      if (data.charAt(0)==1) {
-	        $('#zone1').empty().append("<div class='led-green'></div>");
+	        $('#zone1').empty().append("<div class='led-green'></div><p>1</p>");
 	      }
 	      else {
-	        $('#zone1').empty().append("<div class='led-red'></div>");
+	        $('#zone1').empty().append("<div class='led-red'></div><p>1</p>");
 	      }
 
               if (data.charAt(1)==1) {
-                $('#zone2').empty().append("<div class='led-green'></div>");
+                $('#zone2').empty().append("<div class='led-green'></div><p>2</p>");
               }
               else {
-                $('#zone2').empty().append("<div class='led-red'></div>");
+                $('#zone2').empty().append("<div class='led-red'></div><p>2</p>");
               }
               
               if (data.charAt(2)==1) {
-                $('#zone3').empty().append("<div class='led-green'></div>");
+                $('#zone3').empty().append("<div class='led-green'></div><p>3</p>");
               }
               else {
-                $('#zone3').empty().append("<div class='led-red'></div>");
+                $('#zone3').empty().append("<div class='led-red'></div><p>3</p>");
               }
               
               if (data.charAt(3)==1) {
-                $('#zone4').empty().append("<div class='led-green'></div>");
+                $('#zone4').empty().append("<div class='led-green'></div><p>4</p>");
               }
               else {
-                $('#zone4').empty().append("<div class='led-red'></div>");
+                $('#zone4').empty().append("<div class='led-red'></div><p>4</p>");
+              }
+              
+	      if (data.charAt(4)==1) {
+                $('#gate_state').empty().append("<div class='led-green'></div>");
+              }
+              else {
+                $('#gate_state').empty().append("<div class='led-red'></div>");
+              }
+
+	      if (data.charAt(7)==1) {
+                $('#short_flag').empty().append("<div class='led-green'></div>");
+              }
+              else {
+                $('#short_flag').empty().append("<div class='led-red'></div>");
               }
 
 	    });

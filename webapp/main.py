@@ -1,14 +1,11 @@
 import dataHandler
-
 from flask import *
 from flask_socketio import SocketIO
-
 
 # Create flask app, SocketIO object, and global pi 'thing' object.
 app = Flask(__name__)
 socketio = SocketIO(app)
 dataHandler = dataHandler.dataHandler()
-
 
 # Define app routes.
 # Index route renders the main HTML page.
@@ -37,15 +34,15 @@ def index():
     # Broadcast a temp & humidity change event.
 #   socketio.emit('temp_humidity_change', { 'temperature': temperature, 'humidity': humidity })
 
-def data_change(data, count):
-    socketio.emit('data_change', {'data': data, 'count': count})
+def data_change(data, count, time):
+    socketio.emit('data_change', {'data': data, 'count': count, 'time': time})
 
-@app.route("/test")
+@app.route("/display")
 def test_page():
-	return render_template('test.html')
+	return render_template('display.html')
 
-def data_change(data, count):
-    socketio.emit('data_change', {'data': data, 'count': count})
+def data_change(data, count, time):
+    socketio.emit('data_change', {'data': data, 'count': count, 'time': time})
 
 if __name__ == "__main__":
     # Register callbacks for switch and temp/humidity event changes.
