@@ -24,6 +24,14 @@
         </div>
 
         <div class="container">
+	  <div class = "row">
+	    <div class="col-md-6" id="piggyback" style="font-size:40px">
+	      <span>Status:</span>
+	    </div>
+	    <div>
+	      <p></p>      
+	    </div>
+	  </div>
           <div class="row">
             <div class="col-md-6" style="height: 35em; background-color: #e6e6e6" id="front_screen">
               <!--<img src="{{ url_for('static', filename='images/check-mark.png') }}" style="width:35em; height:35em;"<img>
@@ -62,7 +70,8 @@
 	      count = e.count;
 	      state = data.charAt(6);
 	      button = data.charAt(5);
-	      console.log(button);
+	      //console.log(button);
+	      piggyback = data.charAt(9);
 	      //console.log(count);
 	      //$('#test').empty();
 	      //$('#test').empty().append("data is: " + data);
@@ -71,6 +80,13 @@
 	      }
 	      else {
                 $('#front_screen').empty();
+	      }
+
+	      if (piggyback == 1) {
+	      	$('#piggyback').empty().append("<span>Status: </span><span style='font-size: 40px; color: red'>Piggy-backer Detected</span>");
+	      }
+	      else {
+	      	$('#piggyback').empty().append("<span>Status: </span><span style='font-size: 40px'>Running</span>");
 	      }
 
 	    });

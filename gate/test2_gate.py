@@ -9,9 +9,18 @@ from termios import tcflush, TCIOFLUSH
 import serial, time
 
 from gpiozero import Button
+from gpiozero import LED
 from time import sleep
 
+#initialize indicators and buttons
 button = Button(18)
+led1g = LED(23)
+led1r = LED(24)
+led2g = LED(17)
+led2r = LED(27)
+ledgate = LED(26)
+
+#initialize status variables
 gateState = 0
 piggyback = 0
 
@@ -32,6 +41,7 @@ time.sleep(0.1)
 ser5 = serial.Serial('/dev/ttyUSB1', 115200)
 time.sleep(0.1)
 
+#write "T" and "P" in order to initialize terarangers
 ser4.write("T")
 ser4.write("P")
 ser5.write("T")
@@ -54,14 +64,21 @@ piggybackThreshold = 0
 shortFlag = 0
 alarm = 0
 incrementLock = 0
+led1r.off()
+led1g.off()
+led2r.off()
+led2g.off()
 
 #Timing variables
 startCardTimer = False
 startIdleTimer = False
 startGateTimer = False
+piggybackDebounce = False
+
 cardTimer = 0
 idleTimer = 0
 gateTimer = 0
+piggybackDebounceTimer = 0 
 
 #Current state of the machine
 currState = 1
@@ -90,6 +107,7 @@ while Running:
 
 	if button.is_pressed:
 		if (sensors[2] == 0 and sensors[3] == 0):
+			ledgate.on()
 			if smartCard == 1:
 				cardTimer = 0
 			elif smartCard == 0:
@@ -97,7 +115,7 @@ while Running:
 				currState = 4
 				startCardTimer = True
 	
-	#turn on timer if safe flag 1
+#turn on timer if short flag 1
 	if gate == 1 or shortFlag == 1:
 		startGateTimer = True
 	else:
@@ -125,27 +143,29 @@ while Running:
 	elif alarm == 0:
 		ser3.write("s")
 
-#Timer rules
-        if startCardTimer == True:
-                cardTimer += 1
-                # while loop runs every 0.1 seconds, 10 = roughly 1 sec(not accounting for program runtime)
-                if cardTimer >= 300:
-                        startCardTimer = False
-                        smartCard = 0
-                        cardTimer = 0
-        #idleTimer
-        if startIdleTimer == True:
-                idleTimer += 1
-                if idleTimer >= 150:
-                        alarm = 1
-                        currState = 1
+	#Timer rules
+		if startCardTimer == True:
+			cardTimer += 1
+			# while loop runs every 0.1 seconds, 10 = roughly 1 sec(not accounting for program runtime)
+			if cardTimer >= 300:
+				startCardTimer = False
+				smartCard = 0
+				cardTimer = 0
+				ledgate.off()
+	#idleTimer
+		if startIdleTimer == True:
+			idleTimer += 1
+			if idleTimer >= 200:
+				alarm = 1
+				currState = 1
 
-        #second timer for if gate is open too long
-        if startGateTimer == True:
-                gateTimer += 1
-                if gateTimer >= 150:
-                        alarm = 1
+	#second timer for if gate is open too long
+		if startGateTimer == True:
+			gateTimer += 1
+			if gateTimer >= 200:
+				alarm = 1
 	
+	#Read and process data from sensors serial
 	sensorArray1 = ser1.readline()
 	sensorArray2 = ser2.readline()
 	teraranger1 = ser4.readline()
@@ -169,14 +189,20 @@ while Running:
 	#print(len(sensor1))
 	#print(len(sensor2))
 
-
 	if ((len(sensor1) < 51) or (len(sensor2) < 51)):
 		ser1.flushInput()
 		#print("flushed ser1")
 		ser2.flushInput()
 		#print("flushed ser2")
 		continue
-	
+
+#Piggyback Detection
+	if (currState == 5 or currState == 6):
+		if (piggybackThreshold > 220 and piggybackThreshold < 500):
+			piggyback = 1
+        if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
+		piggyback = 0
+
 	try:
 		if((int(sensor2[8]) + int(sensor1[8])) == 0):
 			shortFlag = 0
@@ -211,18 +237,26 @@ while Running:
 	if orientation == 0:
 		sensors = sensors[::-1]
 		piggybackThreshold = tera2
+		led2r.on()
+		ledgate = led1g
+		#ledgate.on()
 	else:
 		piggybackThreshold = tera1
+		led1r.on()
+		ledgate = led2g
+		#ledgate.on()
 
-#Piggyback Detection
-        if (currState == 5 or currState == 6):
-                if (piggybackThreshold > 220 and piggybackThreshold < 500):
-                        piggyback = 1
-        if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
-                piggyback = 0
 
+
+#piggyback debounce timer			
+#	if piggybackDebounce == True:
+#		piggybackDebounceTimer += 1
+#		if piggybackDebounceTimer >= 10:
+#			alarm = 1
+#			print("piggyback")
+
+#State Machine
 #Set state rules
-
 	if currState == 1:
 #		startIdleTimer = True
 		if (sensors[1] or sensors[2] or sensors[3] == 1):
@@ -274,6 +308,7 @@ while Running:
 	elif currState == 7:
 		smartCard = 0
 		gate = 0
+		ledgate.off()
 		ser3.write("c")
 		if incrementLock == 1:
 			incrementLock = 0

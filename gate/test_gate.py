@@ -13,31 +13,44 @@ from time import sleep
 
 button = Button(18)
 gateState = 0
+piggyback = 0
 
 #User Config Variables
 #Orienation var for direction that gate is allowing patrons through
-#1 for gate on left hand side, 0 for gate on right hand side
-orientation = 1
+#0 for gate on left hand side, 1 for gate on right hand side
+orientation = 0
 
 #front sensor sensors
-ser1 = serial.Serial('/dev/ttyACM2', 115200)
+ser1 = serial.Serial('/dev/ttyACM0', 115200)
+time.sleep(0.1)
 #back sensor sensors
-ser2 = serial.Serial('/dev/ttyACM0', 115200)
-#ser4 = serial.Serial('/dev/ttyUSB0', 115200)
-#ser4.write("T")
-#ser4.write("P")
+ser2 = serial.Serial('/dev/ttyACM1', 115200)
+time.sleep(0.1)
+
+ser4 = serial.Serial('/dev/ttyUSB0', 115200)
+time.sleep(0.1)
+ser5 = serial.Serial('/dev/ttyUSB1', 115200)
+time.sleep(0.1)
+
+ser4.write("T")
+ser4.write("P")
+ser5.write("T")
+ser5.write("P")
 
 #motor arduino
-ser3 = serial.Serial('/dev/ttyACM1', 115200)
+ser3 = serial.Serial('/dev/ttyACM2', 115200)
+time.sleep(0.1)
 
 #flush all sensors before beginning
 ser1.flushInput()
 ser2.flushInput()
-#ser4.flushInput()
+ser4.flushInput()
+ser5.flushInput()
 
 sensors = [0,0,0,0]
 smartCard = 0
 gate = 0
+piggybackThreshold = 0
 shortFlag = 0
 alarm = 0
 incrementLock = 0
@@ -73,6 +86,7 @@ print('Gate Running')
 #print('-----------------')
 
 while Running:
+	time.sleep(0.01)
 
 	if button.is_pressed:
 		if (sensors[2] == 0 and sensors[3] == 0):
@@ -122,31 +136,39 @@ while Running:
         #idleTimer
         if startIdleTimer == True:
                 idleTimer += 1
-                if idleTimer >= 300:
+                if idleTimer >= 150:
                         alarm = 1
                         currState = 1
 
         #second timer for if gate is open too long
         if startGateTimer == True:
                 gateTimer += 1
-                if gateTimer >= 300:
+                if gateTimer >= 150:
                         alarm = 1
 	
 	sensorArray1 = ser1.readline()
 	sensorArray2 = ser2.readline()
-#	teraranger1 = ser4.readline()
+	teraranger1 = ser4.readline()
+	teraranger2 = ser5.readline()
 
 	sensor1 = str(sensorArray1)
 	sensor2 =str(sensorArray2)
 	
-#	tera1 = int_check(str(teraranger1).strip())
+	tera1 = int_check(str(teraranger1).strip())
+	tera2 = int_check(str(teraranger2).strip())
 	
-	#print tera1
+	#print("tera1")
+	print tera1
+	#print("\n")
+	#print("tera2")
+	print tera2
+	#print("\n")
 		
 	print(sensor1)
 	print(sensor2)	
 	#print(len(sensor1))
 	#print(len(sensor2))
+
 
 	if ((len(sensor1) < 51) or (len(sensor2) < 51)):
 		ser1.flushInput()
@@ -161,7 +183,7 @@ while Running:
 		else:
 			shortFlag = 1
 
-		if (int(sensor1[18]) == 1):
+		if (int(sensor1[18]) == 1 or (tera1 > 220 and tera1 < 1400)):
 			sensors[0] = 1
 		else:
 			sensors[0] = 0
@@ -171,7 +193,7 @@ while Running:
 		else:
 			sensors[1] = 0
 
-		if (int(sensor2[18]) == 1):
+		if (int(sensor2[18]) == 1 or (tera2 > 220 and tera2 < 1400)):
 			sensors[3] = 1
 		else:
 			sensors[3] = 0
@@ -188,6 +210,17 @@ while Running:
 #Set orientation
 	if orientation == 0:
 		sensors = sensors[::-1]
+		piggybackThreshold = tera2
+	else:
+		piggybackThreshold = tera1
+
+#Piggyback Detection
+        if (currState == 5 or currState == 6):
+                if (piggybackThreshold > 220 and piggybackThreshold < 500):
+                        piggyback = 1
+			print("Asdfadsfasdfadfadsf")
+        if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
+                piggyback = 0
 
 #Set state rules
 
@@ -250,7 +283,7 @@ while Running:
 			currState = 1
 
 	f = open('data.txt', 'w')
-	printstr = str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + str(gate) + str(smartCard) + str(currState) + str(shortFlag)
+	printstr = str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + str(gate) + str(smartCard) + str(currState) + str(shortFlag) + str(orientation) + str(piggyback)
 	f.write(printstr)
 	f.write("\n")
 	f.write(str(visitors))
@@ -260,4 +293,5 @@ while Running:
 
 	ser1.flushInput()
 	ser2.flushInput()
-#	ser4.flushInput()
+	ser4.flushInput()
+	ser5.flushInput()
