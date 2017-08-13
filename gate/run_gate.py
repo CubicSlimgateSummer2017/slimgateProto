@@ -18,7 +18,7 @@ piggyback = 0
 #User Config Variables
 #Orienation var for direction that gate is allowing patrons through
 #0 for gate on left hand side, 1 for gate on right hand side
-orientation = 0
+orientation = 1
 
 #front sensor sensors
 ser1 = serial.Serial('/dev/ttyACM0', 115200)
