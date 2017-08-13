@@ -1,7 +1,4 @@
-import pygame
-from pygame.locals import *
-
-from threading import Thread
+#Main program containing gate logic and alarms
 
 import os
 import sys
@@ -20,24 +17,26 @@ piggyback = 0
 #0 for gate on left hand side, 1 for gate on right hand side
 orientation = 1
 
-#front sensor sensors
+#front sensor-array sensors
 ser1 = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(0.1)
-#back sensor sensors
+#back sensor-array sensors
 ser2 = serial.Serial('/dev/ttyACM1', 115200)
 time.sleep(0.1)
 
+#initialize tera-ranger sensors
 ser4 = serial.Serial('/dev/ttyUSB0', 115200)
 time.sleep(0.1)
 ser5 = serial.Serial('/dev/ttyUSB1', 115200)
 time.sleep(0.1)
 
+#send initialization sequence to tera-rangers via serial commands
 ser4.write("T")
 ser4.write("P")
 ser5.write("T")
 ser5.write("P")
 
-#motor arduino
+#initialize motor arduino 
 ser3 = serial.Serial('/dev/ttyACM2', 115200)
 time.sleep(0.1)
 
@@ -47,6 +46,7 @@ ser2.flushInput()
 ser4.flushInput()
 ser5.flushInput()
 
+#initialize variables
 sensors = [0,0,0,0]
 smartCard = 0
 gate = 0
@@ -85,9 +85,12 @@ print('Gate Running')
 #print('| 1 | 2 | 3 | 4 |')
 #print('-----------------')
 
+#Loop to gather readings
 while Running:
+	#Get readings every 0.01 seconds
 	time.sleep(0.01)
 
+	#trigger card tag if button is pressed
 	if button.is_pressed:
 		if (sensors[2] == 0 and sensors[3] == 0):
 			if smartCard == 1:
@@ -104,11 +107,10 @@ while Running:
 		gateTimer = 0
 		startGateTimer = False
 
-#Alarm check
+	#Turn on alarm if alarm var is 1
         if alarm == 1:
                 if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
 			ser3.write("s")
-			#print(gate)
 			alarm = 0
                         if startIdleTimer == True:
                                 idleTimer = 0
@@ -125,7 +127,7 @@ while Running:
 	elif alarm == 0:
 		ser3.write("s")
 
-#Timer rules
+	#Timer rules
         if startCardTimer == True:
                 cardTimer += 1
                 # while loop runs every 0.1 seconds, 10 = roughly 1 sec(not accounting for program runtime)
@@ -146,6 +148,7 @@ while Running:
                 if gateTimer >= 150:
                         alarm = 1
 	
+	#Get sensor readings from all serial devices
 	sensorArray1 = ser1.readline()
 	sensorArray2 = ser2.readline()
 	teraranger1 = ser4.readline()
@@ -154,29 +157,17 @@ while Running:
 	sensor1 = str(sensorArray1)
 	sensor2 =str(sensorArray2)
 	
+	#Convert serial readings to int
 	tera1 = int_check(str(teraranger1).strip())
 	tera2 = int_check(str(teraranger2).strip())
 	
-	#print("tera1")
-	#print tera1
-	#print("\n")
-	#print("tera2")
-	#print tera2
-	#print("\n")
-		
-	#print(sensor1)
-	#print(sensor2)	
-	#print(len(sensor1))
-	#print(len(sensor2))
-
-
+	#check if serial reading is the right length, else flush
 	if ((len(sensor1) < 51) or (len(sensor2) < 51)):
 		ser1.flushInput()
-		#print("flushed ser1")
 		ser2.flushInput()
-		#print("flushed ser2")
 		continue
 	
+	#set the zones in array sensors[] according to hardware sensor readings
 	try:
 		if((int(sensor2[8]) + int(sensor1[8])) == 0):
 			shortFlag = 0
@@ -204,24 +195,23 @@ while Running:
 			sensors[2] = 0
 
 	except (ValueError, IndexError):
-#		print("parse error, passing")
 		continue
 
-#Set orientation
+	#Set orientation
 	if orientation == 0:
 		sensors = sensors[::-1]
 		piggybackThreshold = tera2
 	else:
 		piggybackThreshold = tera1
 
-#Piggyback Detection
+	#Piggyback Detection
         if (currState == 5 or currState == 6):
                 if (piggybackThreshold > 220 and piggybackThreshold < 500):
                         piggyback = 1
         if sensors[0] == 0 and sensors[1] == 0 and sensors[2] == 0 and sensors[3] == 0 and shortFlag == 0:
                 piggyback = 0
 
-#Set state rules
+	#Set state machine rules
 
 	if currState == 1:
 #		startIdleTimer = True
@@ -232,8 +222,6 @@ while Running:
 			startIdleTimer = False
 			idleTimer = 0
 			currState = 2
-#               elif (sensors[1] or sensors[2] or sensors[3] == 1):
-#                       startIdleTimer = True
 	elif currState == 2:
 		startIdleTimer = True
 		if sensors[1] == 1:
@@ -266,9 +254,6 @@ while Running:
 			currState = 6
 	elif currState == 6:
                 smartCard = 0
-#		if gate == 1:
-#                	gate = 0
-#			ser3.write("c")
 		if sensors[3] == 1 or shortFlag == 0:
 			currState = 7
 	elif currState == 7:
@@ -280,7 +265,8 @@ while Running:
 		startIdleTimer = True
 		if sensors [3] == 0:
 			currState = 1
-
+	
+	#Writes information to data.txt to use with flask server
 	f = open('data.txt', 'w')
 	printstr = str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + str(gate) + str(smartCard) + str(currState) + str(shortFlag) + str(orientation) + str(piggyback)
 	f.write(printstr)
@@ -288,8 +274,10 @@ while Running:
 	f.write(str(visitors))
 	f.close()
 	
+	#For debugging only
 	#print('gate:' + str(gate) + ' sensors:' + str(sensors[0]) + str(sensors[1]) + str(sensors[2]) + str(sensors[3]) + ' card:' + str(smartCard) + ' state:' + str(currState) + " flag:" + str(shortFlag))
 
+	#flush inputs
 	ser1.flushInput()
 	ser2.flushInput()
 	ser4.flushInput()

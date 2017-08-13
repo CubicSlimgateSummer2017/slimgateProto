@@ -1,3 +1,5 @@
+#Essentially the same program as run_gate, but with a lot of print statements for debugging purposes
+
 import pygame
 from pygame.locals import *
 
