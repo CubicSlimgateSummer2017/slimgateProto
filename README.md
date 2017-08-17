@@ -1,5 +1,7 @@
 # slimgateProto
 
+To run the program, run bash script with command ./slimgate.sh from the folder. This runs both the gate itself and the flask server.
+
 *  gate/ - directory that contains all programs relevant to the operation of the gate, its motors and sensors and hardware test programs.
 	*  data.txt - data file that allows socket.io bit transfer, there should be a better solution that to do this but linux prevents concurrency issues
 	*  run_gate.py - main program that runs the gate, contains gate logic and alarms and deals with all serial readings.
