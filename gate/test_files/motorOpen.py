@@ -1,3 +1,5 @@
+#testing opening motino of gate
+
 from gpiozero import LED
 from time import sleep
 

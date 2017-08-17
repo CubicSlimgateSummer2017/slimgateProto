@@ -1,3 +1,5 @@
+#Tests if button is working
+
 from gpiozero import Button
 
 button = Button(18)

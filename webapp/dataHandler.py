@@ -1,3 +1,5 @@
+#data handler object that reads bits from the data.txt file in the gate directory and 
+
 import time
 import threading
 from datetime import datetime

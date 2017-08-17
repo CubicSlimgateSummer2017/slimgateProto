@@ -1,3 +1,5 @@
+#final version of gate state machine simulation
+
 import pygame
 from pygame.locals import *
 import sys

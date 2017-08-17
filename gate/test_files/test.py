@@ -1,3 +1,5 @@
+#testing curses keypress module
+
 import curses
 import time
 #import pygame

@@ -1,3 +1,5 @@
+#testing closing motion of gate
+
 from gpiozero import LED
 from time import sleep
 

@@ -1,3 +1,5 @@
+#version 2 of original state machine simulation
+
 import pygame
 from pygame.locals import *
 

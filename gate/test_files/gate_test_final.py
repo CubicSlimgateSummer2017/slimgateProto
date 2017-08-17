@@ -1,3 +1,5 @@
+#final version of gate logic state machine including sensor readings
+
 import pygame
 from pygame.locals import *
 

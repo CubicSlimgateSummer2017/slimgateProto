@@ -1,3 +1,5 @@
+#Program that tests the driving of the motor on the Pi
+
 from curses import wrapper
 from gpiozero import LED
 from time import sleep

@@ -1,3 +1,5 @@
+#test to see if threads could be used to run motor (unsucessful), ended up using external solution
+
 #import pygame for keyboard control
 import pygame
 from pygame.locals import *

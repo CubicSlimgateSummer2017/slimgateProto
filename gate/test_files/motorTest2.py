@@ -1,3 +1,5 @@
+#test motor movement with PWM
+
 from gpiozero import PWMOutputDevice
 from time import sleep
 

@@ -1,3 +1,5 @@
+#testing reading and writing to serial and sensors
+
 import serial, time
 
 ser1 = serial.Serial('/dev/ttyACM1', 9600)
