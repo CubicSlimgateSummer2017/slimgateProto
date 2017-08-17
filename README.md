@@ -25,5 +25,8 @@
 *  webapp/ - directory that contains all programs relevant to the web gui, html templates, and flask server
 	*  dataHandler.py - defines a threaded object that handles the reading of data from data.txt in the gate folder
 	*  main.py - starts flask server with socket.io, updating the frontend with data from data.txt (which run_gate.py writes into)
-
+	*  static/ - directory containing css files, image files, and other Javascript files like socket.io, boostrap, etc.
+	*  templates/ - directory containing html templates to be render by flaks server
+		*  display.html - mock lcd screens for dashboard, simulating the two lcd screens on either side of the gate that indicate whether the user would enter
+		*  index.html - main dashboard screen, including indicators for all the sensors and keeping track of gate uptime, current state, sensor zone triggers etc.
 *  slimgate.sh - main bash file used to start program.  runs run_gate.py in gate directory (gate operation and backend) and main.py in webapp directory (flask server with socket.io)
