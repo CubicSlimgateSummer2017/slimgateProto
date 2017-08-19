@@ -42,4 +42,11 @@ Arduino Code Overview:
 *  StepperTest.ino - First motor/alarm control program with functions set off by Serial readings.  Tried to implement software linear acceleration but ultimately constant speed worked better
 *  final_motor_test.ino	- Final motor/alarm control program, uploaded to the board.  Sets off alarm and ran the motors when triggered with certain serial chars.  This step was deemed necessary because context switching in linux caused the need for a new/separate controller for frequency sensitive applications like motor control.
 *  limitswitch.ino - test program for reading state of limitswitches
-*  sensor_array_readings.ino - final program uploaded to sensors 
+*  sensor_array_readings.ino - final program uploaded to sensors
+
+Debugging and Troubleshooting
+1.  Check that all USB connections are plugged in.  The blue LEDs from each port on the USB hub need to be on, if they are not on then serial data is not transmitting.
+
+2.  The initialization of the USB ports may change in order, if the sensors are not picking up signal try swapping ports ACM1 and ACM2, or ACM0, etc.  Use web gui to see if sensors are picking up correctly.
+
+3.  If the motor is not working, check the kill switch.  Then check the wiring of the limit switches, if they come off the motor would not run.
