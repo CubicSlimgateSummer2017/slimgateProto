@@ -1,6 +1,10 @@
 # slimgateProto
 
-To run the program, run bash script with command ./slimgate.sh from the folder. This runs both the gate itself and the flask server.
+To run the program, run bash script with command ./slimgate.sh from the folder. This runs both the gate itself and the flask server.  Code should be run from a raspberry pi, with appropriate packages installed, such as flask, socket.io, gpiozero, etc.
+
+Programs for motor control and sensor array read are included separately as .ino files as they are uploaded to the Arduino Micros that control them.
+
+Raspberry Pi Code Overview:
 
 *  gate/ - directory that contains all programs relevant to the operation of the gate, its motors and sensors and hardware test programs.
 	*  data.txt - data file that allows socket.io bit transfer, there should be a better solution that to do this but linux prevents concurrency issues
@@ -32,3 +36,10 @@ To run the program, run bash script with command ./slimgate.sh from the folder. 
 		*  display.html - mock lcd screens for dashboard, simulating the two lcd screens on either side of the gate that indicate whether the user would enter
 		*  index.html - main dashboard screen, including indicators for all the sensors and keeping track of gate uptime, current state, sensor zone triggers etc.
 *  slimgate.sh - main bash file used to start program.  runs run_gate.py in gate directory (gate operation and backend) and main.py in webapp directory (flask server with socket.io)
+
+Arduino Code Overview:
+
+*  StepperTest.ino - First motor/alarm control program with functions set off by Serial readings.  Tried to implement software linear acceleration but ultimately constant speed worked better
+*  final_motor_test.ino	- Final motor/alarm control program, uploaded to the board.  Sets off alarm and ran the motors when triggered with certain serial chars.  This step was deemed necessary because context switching in linux caused the need for a new/separate controller for frequency sensitive applications like motor control.
+*  limitswitch.ino - test program for reading state of limitswitches
+*  sensor_array_readings.ino - final program uploaded to sensors 
