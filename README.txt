@@ -1,4 +1,14 @@
 # slimgateProto
+
+Requirements:
+
+- Python 2.7.9 installed
+- flask installed
+- socket.io installed
+- gpiozero installed
+- Raspberry Pi with ethernet or wifi connection
+- Terminal with SSH capability(preferable) or Raspberry Pi connected to keyboard and monitor
+
 Startup:
 
 Run sudo apt-get update and sudo apt-get upgrade on linux to install packages.
